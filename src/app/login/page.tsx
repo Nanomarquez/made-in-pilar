@@ -114,8 +114,6 @@ function LoginPage() {
     }
   }
 
-  console.log(deviceType);
-
   return (
     <div className="flex justify-center items-center h-screen w-screen">
       {/* {deviceType === "desktop" && ( */}

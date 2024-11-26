@@ -19,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>MIP</title>
+      </head>
       <body className={`antialiased h-screen w-screen bg-[#0a0a0a]`}>
         <Providers>
         <DeviceDetector />
