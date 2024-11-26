@@ -46,7 +46,7 @@ function AdminPage() {
     dispatch(setLoading(true));
 
     try {
-      const response = await fetch(`/api/get-users`);
+      const response = await fetch(`https://made-in-pilar-swfo.vercel.app/api/get-users`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -64,7 +64,7 @@ function AdminPage() {
 
   const fetchReservationsPending = useCallback(async () => {
     dispatch(setLoading(true));
-    const response = await fetch(`/api/reservations-pending`);
+    const response = await fetch(`https://made-in-pilar-swfo.vercel.app/api/reservations-pending`);
     const data = await response.json();
     dispatch(setLoading(false));
     setSize(data);
@@ -74,7 +74,7 @@ function AdminPage() {
     if (!selectedReservDate) return;
     dispatch(setLoading(true));
     const response = await fetch(
-      `/api/availability?date=${selectedReservDate.toISOString().split("T")[0]}`
+      `https://made-in-pilar-swfo.vercel.app/api/availability?date=${selectedReservDate.toISOString().split("T")[0]}`
     );
     const data = await response.json();
     dispatch(setLoading(false));
@@ -85,7 +85,7 @@ function AdminPage() {
     if (!selectedPendingDate) return;
     dispatch(setLoading(true));
     const response = await fetch(
-      `/api/reservations?date=${
+      `https://made-in-pilar-swfo.vercel.app/api/reservations?date=${
         selectedPendingDate.toISOString().split("T")[0]
       }`
     );
@@ -96,7 +96,7 @@ function AdminPage() {
 
   const handleChangeStatus = async (id: string, status: string) => {
     dispatch(setLoading(true));
-    const response = await fetch(`/api/reservations?id=${id}`, {
+    const response = await fetch(`https://made-in-pilar-swfo.vercel.app/api/reservations?id=${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),

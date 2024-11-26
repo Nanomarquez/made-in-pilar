@@ -30,8 +30,8 @@ export const BookingCalendar = ({
       dispatch(setLoading(true));
 
       const url = isAdmin
-        ? `/api/reservations-monthly?date=${month}`
-        : `/api/reservations-monthly?date=${month}&id=${userCredentials?.uid}`;
+        ? `https://made-in-pilar-swfo.vercel.app/api/reservations-monthly?date=${month}`
+        : `https://made-in-pilar-swfo.vercel.app/api/reservations-monthly?date=${month}&id=${userCredentials?.uid}`;
 
       try {
         const response = await fetch(url);

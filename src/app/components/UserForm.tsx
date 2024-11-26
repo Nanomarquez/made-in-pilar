@@ -19,7 +19,7 @@ function UserForm({ fetchUsers }: Readonly<UserFormProps>) {
     dispatch(setLoading(true));
     setError(null);
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("https://made-in-pilar-swfo.vercel.app/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password: "12345678" }),

@@ -35,7 +35,7 @@ export const BookingForm = ({
       return;
     }
     try {
-      const response = await fetch("/api/reservations", {
+      const response = await fetch("https://made-in-pilar-swfo.vercel.app/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -63,7 +63,7 @@ export const BookingForm = ({
     dispatch(setLoading(true));
 
     try {
-      const response = await fetch(`/api/get-users`);
+      const response = await fetch(`https://made-in-pilar-swfo.vercel.app/api/get-users`);
       const data = await response.json();
 
       if (!response.ok) {
