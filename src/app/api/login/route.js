@@ -28,8 +28,16 @@ export async function POST(req) {
       );
     }
 
+    console.log({ userDoc: userDoc.data() });
+
+    console.log({ adminAuth });
+
     // Generar token personalizado
     const token = await adminAuth.createCustomToken(userDoc.id);
+
+    console.log({ adminAuth });
+
+    console.log({ token });
 
     return NextResponse.json({ token });
   } catch (error) {
