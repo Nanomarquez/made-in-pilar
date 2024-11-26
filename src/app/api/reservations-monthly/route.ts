@@ -1,25 +1,40 @@
 import { db } from "@/lib/firebase";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
-import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date"); // Ejemplo: "2024-11"
   const id = searchParams.get("id"); // Ejemplo: "2024-11"
-  
+
   if (!date) {
-    return NextResponse.json(
-      { error: "No se ha proporcionado una fecha válida." },
-      { status: 400 }
+    return new Response(
+      JSON.stringify({ error: "No se ha proporcionado una fecha válida." }),
+      {
+        status: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
     );
   }
 
   const [year, month] = date.split("-").map(Number);
 
   if (!year || !month) {
-    return NextResponse.json(
-      { error: "El formato de fecha no es válido. Debe ser 'YYYY-MM'." },
-      { status: 400 }
+    return new Response(
+      JSON.stringify({
+        error: "El formato de fecha no es válido. Debe ser 'YYYY-MM'.",
+      }),
+      {
+        status: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
     );
   }
 
@@ -28,6 +43,7 @@ export async function GET(request: Request) {
   const endDate = new Date(year, month, 0) // último día del mes
     .toISOString()
     .split("T")[0]; // Formato "YYYY-MM-DD"
+
   let q;
   if (id) {
     q = query(
@@ -48,13 +64,6 @@ export async function GET(request: Request) {
       orderBy("from", "asc")
     );
   }
-  // const q = query(
-  //   collection(db, "reservations"),
-  //   where("date", ">=", startDate),
-  //   where("date", "<=", endDate),
-  //   orderBy("date", "asc"),
-  //   orderBy("from", "asc")
-  // );
 
   try {
     const snapshot = await getDocs(q);
@@ -64,12 +73,26 @@ export async function GET(request: Request) {
       return { id, ...data };
     });
 
-    return NextResponse.json(reservations);
+    return new Response(JSON.stringify(reservations), {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Error al obtener las reservas." },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ error: "Error al obtener las reservas." }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
     );
   }
 }

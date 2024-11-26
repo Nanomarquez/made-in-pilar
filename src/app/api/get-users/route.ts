@@ -1,18 +1,51 @@
 import { db } from "@/lib/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { NextResponse } from "next/server";
 
 export async function GET() {
-  const q = query(collection(db, "users"), where("username", "not-in", ["Admin"]));
-  const snapshot = await getDocs(q);
-  const users = snapshot.docs.map((doc) => {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("username", "not-in", ["Admin"])
+    );
+    const snapshot = await getDocs(q);
+    const users = snapshot.docs.map((doc) => {
+      const id = doc.id;
+      const createdAt = doc.data().createdAt;
 
-    const id = doc.id;
+      return { id, createdAt };
+    });
 
-    const createdAt = doc.data().createdAt;
+    return new Response(JSON.stringify(users), {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
+  } catch (error) {
+    console.error("Error al obtener los usuarios:", error);
+    return new Response(
+      JSON.stringify({ error: "Error al obtener los usuarios" }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
+    );
+  }
+}
 
-    return {id,createdAt};
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
   });
-
-  return NextResponse.json(users);
 }
