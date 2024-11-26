@@ -1,7 +1,8 @@
-import { initializeApp, cert, getApps, getApp } from 'firebase-admin/app';
+import { initializeApp, cert, getApps, getApp, ServiceAccount } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
+import serviceAccountKey from './serviceAccountKey.json';
 
-const serviceAccount = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_SERVICE_ACCOUNT_KEY ?? "{}");
+const serviceAccount = serviceAccountKey as ServiceAccount;
 
 const app = !getApps().length
   ? initializeApp({
