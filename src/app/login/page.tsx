@@ -118,9 +118,6 @@ function LoginPage() {
         <p className="text-center text-white text-2xl md:text-3xl font-normal pb-3 md:pb-6">
           {isRegister ? "Registro" : "Iniciar sesión"}
         </p>
-        <p className="text-center text-white text-2xl md:text-3xl font-normal pb-3 md:pb-6">
-          {process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL}
-        </p>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <div>
           <Label htmlFor="email">{}Ingresa tu usuario</Label>

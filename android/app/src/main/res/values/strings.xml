@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">madeinpilar</string>
-    <string name="title_activity_main">madeinpilar</string>
+    <string name="app_name">Madeinpilar</string>
+    <string name="title_activity_main">Madeinpilar</string>
     <string name="package_name">com.madeinpilar.app</string>
     <string name="custom_url_scheme">com.madeinpilar.app</string>
 </resources>
