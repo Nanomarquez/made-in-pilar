@@ -1,93 +1,114 @@
-"use client";
-
-import React, { useCallback, useEffect, useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import { messages } from "@/constants";
+import { ParsedRservations, Reservations, Status } from "@/interfaces";
+import { dayPropGetter, parseReservationsToEventsDay } from "@/services/parse";
 import dayjs from "dayjs";
-import { useDispatch } from "react-redux";
-import { setLoading } from "@/redux/global/globalSlice";
-import { Reservation } from "@/lib/types";
+import React from "react";
+import {
+  Calendar,
+  dayjsLocalizer,
+  Views,
+  EventProps,
+} from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import CustomEventComponent from "./CustomEventComponent";
+import { onSelectSlot } from "@/services/utils";
 import { useAppSelector } from "@/redux/hooks";
-
-export const BookingCalendar = ({
-  onDateSelect,
-  selectedDate,
-  isAdmin = false,
-  disablePast = false,
+function CustomCalendar({
+  view,
+  date,
+  setSelectedReservDate,
+  setView,
+  setDate,
+  reservations,
+  setFromTime,
+  setToTime,
+  setSelectEvent,
 }: {
-  onDateSelect: (date: Date) => void;
-  selectedDate: Date | null;
-  isAdmin?: boolean;
-  disablePast?: boolean;
-}) => {
-  const { userCredentials } = useAppSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const fetchMonthlyReservations = useCallback(
-    async (month: string) => {
-      if (!month) return; // El formato debe ser "YYYY-MM"
+  view: (typeof Views)[keyof typeof Views];
+  date: Date;
+  setSelectedReservDate: React.Dispatch<React.SetStateAction<Date | null>>;
+  setView: React.Dispatch<
+    React.SetStateAction<(typeof Views)[keyof typeof Views]>
+  >;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  reservations: Reservations[];
+  setFromTime: React.Dispatch<React.SetStateAction<Date | null>>;
+  setToTime: React.Dispatch<React.SetStateAction<Date | null>>;
+  setSelectEvent: React.Dispatch<
+    React.SetStateAction<ParsedRservations | null>
+  >;
+}) {
+  const { isAdmin, userData } = useAppSelector((state) => state.auth);
+  const localizer = dayjsLocalizer(dayjs);
 
-      dispatch(setLoading(true));
+  function CustomEventWrapper(
+    props: EventProps & { event: { status: Status; title: string } }
+  ) {
+    return <CustomEventComponent {...props} />;
+  }
 
-      const url = isAdmin
-        ? `/api/reservations-monthly?date=${month}`
-        : `/api/reservations-monthly?date=${month}&id=${userCredentials?.uid}`;
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (!response.ok) {
-          console.error("Error fetching reservations:", data.error);
-          return;
-        }
-
-        setReservations(data);
-      } catch (err) {
-        console.error("Error fetching reservations:", err);
-      } finally {
-        dispatch(setLoading(false));
-      }
-    },
-    [dispatch, isAdmin, userCredentials?.uid]
-  );
-
-  useEffect(() => {
-    if (selectedDate) {
-      fetchMonthlyReservations(dayjs(selectedDate).format("YYYY-MM"));
-    } else {
-      fetchMonthlyReservations(dayjs(new Date()).format("YYYY-MM"));
-    }
-  }, [fetchMonthlyReservations, selectedDate]);
-
-  const handleDateChange = (newDate: Date) => {
-    onDateSelect(newDate);
-  };
-
-  const tileDisabled = ({ date }: { date: Date }) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Asegúrate de comparar solo las fechas, sin considerar horas
-    return date < today; // Deshabilita solo los días estrictamente anteriores a hoy
-  };
-
-  const tileAdming = ({ date }: { date: Date }) => {
-    if (
-      reservations.find((res) => res.date === dayjs(date).format("YYYY-MM-DD"))
-    ) {
-      return false;
-    } else {
-      return true;
-    }
+  const components = {
+    event: view === "month" ? undefined : CustomEventWrapper,
   };
 
   return (
-    <div>
+    <div className="h-[400px] w-full glass flex flex-col">
       <Calendar
-        className={"!bg-black/50 !border-none !rounded-lg !text-white md:!w-full"}
-        tileDisabled={disablePast ? tileDisabled : tileAdming}
-        onChange={(e) => handleDateChange(e as Date)}
-        value={selectedDate}
+        style={{ height: "400px" }}
+        messages={messages}
+        // views={[Views.MONTH, Views.DAY, Views.AGENDA]}
+        views={
+          isAdmin
+            ? [Views.MONTH, Views.DAY, Views.AGENDA]
+            : [Views.MONTH, Views.DAY]
+        }
+        defaultView={view}
+        view={view}
+        date={date}
+        onView={(view) => {
+          setSelectEvent(null);
+          setSelectedReservDate(null);
+          setView(view);
+        }}
+        onNavigate={(date) => {
+          setSelectedReservDate(null);
+          setSelectEvent(null);
+          setDate(new Date(date));
+        }}
+        localizer={localizer}
+        events={
+          view === "month"
+            ? undefined
+            : parseReservationsToEventsDay(
+                reservations,
+                isAdmin,
+                userData?.username
+              )
+        }
+        dayPropGetter={dayPropGetter(reservations, view)}
+        components={components}
+        onSelectSlot={(event) => {
+          setSelectEvent(null);
+          onSelectSlot({
+            event,
+            view,
+            reservations,
+            setSelectedReservDate,
+            setFromTime,
+            setToTime,
+          });
+        }}
+        selectable
+        step={60}
+        timeslots={1}
+        onSelectEvent={(e) => {
+          if (!isAdmin) return;
+          setSelectedReservDate(null);
+          setSelectEvent(e);
+        }}
       />
     </div>
   );
-};
+}
+
+export default CustomCalendar;

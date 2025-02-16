@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "@/lib/firebase";
 import { useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { setUserData } from "@/redux/auth/authSlice";
 export function AuthenticatedLayout({
   children,
@@ -17,7 +17,7 @@ export function AuthenticatedLayout({
   const [user] = useAuthState(auth);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    if (pathname !== "/login" && pathname !== "/register") {
+    if (pathname !== "/login") {
       if (!isAuth) {
         router.push("/login");
       }
@@ -28,19 +28,19 @@ export function AuthenticatedLayout({
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
-        // Referencia al documento del usuario en Firestore
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists() && userDocSnap.data().onboardingCompleted) {
-          dispatch(setUserData(userDocSnap.data()));
+        const q = query(
+          collection(db, "users"),
+          where("email", "==", user.email)
+        );
+        const snapshot = await getDocs(q);
+        if (snapshot.size > 0) {
+          const userData = snapshot.docs[0].data();
+          dispatch(setUserData(userData));
         } else {
           console.log("No se encontraron datos del usuario en Firestore.");
         }
       }
     };
-
-    // Llamar a la función que obtiene los datos del usuario
     fetchUserData();
   }, [user, dispatch]); // Se ejecuta cada vez que el usuario cambie
 

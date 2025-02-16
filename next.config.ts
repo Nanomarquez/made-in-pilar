@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  transpilePackages: ['react-big-calendar'],
+  reactStrictMode: true,
+  compiler: {
+    removeConsole: false,
+  },
 };
 
 export default nextConfig;

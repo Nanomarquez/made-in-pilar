@@ -11,8 +11,10 @@ function SideBar() {
     return (
       <div
         className={`${
-          deviceType === "desktop" ? "h-screen w-24" : "w-screen h-[80px]"
-        } bg-[#1b1b1b]/50 backdrop-blur-md flex flex-row lg:flex-col gap-5 p-5 top-0 left-0 lg:rounded-r-3xl shadow-2xl items-center justify-between`}
+          deviceType === "desktop"
+            ? "h-screen w-24 top-0 left-0"
+            : "w-screen h-[80px] rounded-t-lg fixed bottom-0"
+        } bg-[#1b1b1b]/50 backdrop-blur-md flex flex-row lg:flex-col gap-5  p-5  left-0 lg:rounded-r-3xl shadow-2xl items-center justify-between`}
       >
         <div className="flex flex-col justify-center items-center">
           <span className="text-red-600">

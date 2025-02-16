@@ -19,11 +19,7 @@ export default function Home() {
   const router = useRouter();
   useEffect(() => {
     if (!open) {
-      if (userCredentials?.uid === "Admin") {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/calendar");
     }
   }, [router, userCredentials?.uid, open]);
 

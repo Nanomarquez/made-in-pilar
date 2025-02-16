@@ -8,18 +8,52 @@ import {
   orderBy,
   setDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const date = searchParams.get("date");
+    const dateParam = searchParams.get("date"); // Fecha en formato ISO string
+    const usernameParam = searchParams.get("username"); // Fecha en formato ISO string
 
-    const q = query(
-      collection(db, "reservations"),
-      where("date", "==", date),
-      orderBy("from", "asc")
-    );
+    if (!dateParam) {
+      return new Response(
+        JSON.stringify({ error: "Se requiere el parámetro 'date'." }),
+        {
+          status: 400,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          },
+        }
+      );
+    }
+
+    const date = new Date(dateParam);
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1); // Inicio del mes
+    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999); // Fin del mes
+
+    let q;
+    
+    if(usernameParam){
+      q = query(
+        collection(db, "reservations"),
+        where('userId', "==", usernameParam),
+        where("from", ">=", startOfMonth), // Inicia dentro del mes
+        where("from", "<=", endOfMonth), // Termina dentro del mes
+        orderBy("from", "asc") // Ordenar por fecha de inicio
+      );
+    }else{
+      q = query(
+        collection(db, "reservations"),
+        where("from", ">=", startOfMonth), // Inicia dentro del mes
+        where("from", "<=", endOfMonth), // Termina dentro del mes
+        orderBy("from", "asc") // Ordenar por fecha de inicio
+      );
+    }
+
     const snapshot = await getDocs(q);
     const reservations = snapshot.docs.map((doc) => {
       const data = doc.data();
@@ -52,24 +86,34 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, date, from, to, status } = body;
+    const { userId, from, to, status } = body;
+
+    const newStart = new Date(from);
+    const newEnd = new Date(to);
 
     const reservationsSnapshot = await getDocs(
-      query(collection(db, "reservations"), where("date", "==", date))
+      query(collection(db, "reservations"))
     );
 
     // Validar conflictos
     const hasConflict = reservationsSnapshot.docs.some((doc) => {
       const reservation = doc.data();
-      const reservationStart = parseTime(reservation.from);
-      const reservationEnd = parseTime(reservation.to);
-      const newStart = parseTime(from);
-      const newEnd = parseTime(to);
-      if (reservation.status === "rejected") return false;
+      const reservationStart = reservation.from.toDate(); // Convierte Timestamp a Date
+      const reservationEnd = reservation.to.toDate(); // Convierte Timestamp a Date
+      
+      // Imprimir para depuración
+      console.log("New reservation start:", newStart);
+      console.log("New reservation end:", newEnd);
+      console.log("Existing reservation start:", reservationStart);
+      console.log("Existing reservation end:", reservationEnd);
+    
+      if (reservation.status === "rejected") return false; // Ignorar reservas rechazadas
+    
+      // Verificar superposición de fechas
       return (
-        (newStart >= reservationStart && newStart < reservationEnd) || // Empieza dentro de un rango
-        (newEnd > reservationStart && newEnd <= reservationEnd) || // Termina dentro de un rango
-        (newStart <= reservationStart && newEnd >= reservationEnd) // Abarca todo el rango
+        (newStart >= reservationStart && newStart < reservationEnd) || // Empieza dentro del rango existente
+        (newEnd > reservationStart && newEnd <= reservationEnd) || // Termina dentro del rango existente
+        (newStart <= reservationStart && newEnd >= reservationEnd) // Abarca todo el rango existente
       );
     });
 
@@ -90,9 +134,8 @@ export async function POST(request: Request) {
     // Crear reserva
     const docRef = await addDoc(collection(db, "reservations"), {
       userId,
-      date,
-      from,
-      to,
+      from: newStart,
+      to: newEnd,
       status,
     });
 
@@ -138,11 +181,27 @@ export async function PUT(request: Request) {
       );
     }
 
-    await setDoc(
-      doc(db, "reservations", id),
-      { status },
-      { merge: true }
-    );
+    if (status === "delete") {
+      await deleteDoc(doc(db, "reservations", id));
+      return new Response(
+        JSON.stringify({ message: `Reserva con ID ${id} eliminada.` }),
+        {
+          status: 200,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          },
+        }
+      );
+    }else{
+      await setDoc(
+        doc(db, "reservations", id),
+        { status },
+        { merge: true }
+      );
+    }
+
 
     return new Response(JSON.stringify({ status }), {
       status: 200,
@@ -177,10 +236,4 @@ export async function OPTIONS() {
       "Access-Control-Allow-Headers": "Content-Type",
     },
   });
-}
-
-// Helper para convertir tiempo "HH:mm" a minutos desde medianoche
-function parseTime(time: string): number {
-  const [hours, minutes] = time.split(":").map(Number);
-  return hours * 60 + minutes;
 }

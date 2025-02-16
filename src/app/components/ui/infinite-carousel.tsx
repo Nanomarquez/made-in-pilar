@@ -37,7 +37,7 @@ export default function VerticalInfiniteCarousel({
         {duplicatedImages.map((src, index) => (
           <Image
             key={`${index}-${src.src}`}
-            className="w-full h-screen object-cover rounded-lg hover:scale-105 duration-200 hover:z-50 hover:brightness-125"
+            className="w-full h-screen object-cover rounded-lg hover:scale-105 duration-200 hover:z-50 hover:brightness-125 drop-shadow-lg"
             src={src}
             height={500}
             width={500}

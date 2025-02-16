@@ -1,27 +1,31 @@
 import { db } from "@/lib/firebase";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  const username = searchParams.get("username");
   let q;
-  if (id) {
+  if (username) {
     q = query(
       collection(db, "reservations"),
-      where("userId", "==", id),
-      where("status", "==", "pending"),
-      orderBy("date", "asc")
+      where("userId", "==", username),
+      where("status", "==", "pending")
     );
   } else {
     q = query(
       collection(db, "reservations"),
-      where("status", "==", "pending"),
-      orderBy("date", "asc")
+      where('status',"==","pending")
     );
   }
 
   try {
     const snapshot = await getDocs(q);
+    const reservations = snapshot.docs.map(reservation=>{
+      console.log(reservation);
+      return reservation.data();
+    })
+    console.log(reservations);
+    console.log(snapshot.docs);
     const size = snapshot.size;
 
     return new Response(JSON.stringify(size), {

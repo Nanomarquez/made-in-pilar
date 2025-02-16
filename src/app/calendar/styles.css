@@ -1,0 +1,135 @@
+.rbc-month-view .rbc-header,
+.rbc-day-slot .rbc-time-header-cell,
+.rbc-toolbar-label {
+  text-transform: capitalize;
+}
+
+.rbc-toolbar {
+  padding-top: 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.rbc-toolbar-label {
+  justify-self: flex-end !important;
+  order: 3 !important;
+}
+
+.rbc-current-time-indicator {
+  display: none !important;
+}
+
+.rbc-event {
+  width: 100% !important;
+  z-index: 2 !important;
+}
+
+.rbc-events-container {
+  margin-right: 0 !important;
+}
+
+.rbc-event-content {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.rbc-header button span[role="columnheader"] {
+  text-transform: capitalize;
+}
+
+.rbc-btn-group {
+  display: flex !important;
+  gap: 5px !important;
+  align-items: center;
+  position: relative;
+}
+
+.rbc-btn-group button {
+  all: unset !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  padding: 5px !important;
+  font-weight: bold !important;
+  box-shadow: 0px 0.5px 1.5px rgba(95, 31, 243, 0.25),
+    inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  background: linear-gradient(180deg, #8379e2 0%, #4335c5 100%) !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.rbc-btn-group button:hover {
+  opacity: 0.7 !important;
+}
+
+.rbc-time-slot:hover {
+  cursor: pointer !important;
+  background-color: #9c9c9c !important;
+}
+
+.rbc-day-slot .rbc-time-column {
+  position: relative !important;
+}
+
+.rbc-time-slot {
+  z-index: 1 !important;
+}
+
+.rbc-button-link {
+  cursor: pointer !important;
+}
+
+.rbc-date-cell {
+  padding-right: 1px !important;
+  position: sticky !important;
+  top: 0 !important;
+  text-align: center !important;
+}
+
+.rbc-today {
+  background-color: #fff;
+}
+
+.custom-day-component {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+}
+
+.custom-day-component .date {
+  font-weight: bold;
+}
+
+.custom-day-component .event-count {
+  color: #555;
+}
+
+.rbc-event-label {
+  position: absolute !important;
+}
+
+.rbc-time-header {
+  display: none !important;
+  visibility: hidden !important;
+}
+/* first child hidden */
+/* .rbc-toolbar > *:first-child {
+  display: none !important;
+  visibility: hidden !important;
+} */
+
+.rbc-date-cell.rbc-now {
+  font-weight: normal !important;
+}
+
+.rbc-month-row {
+  justify-content: center !important;
+}
+
+.rbc-agenda-time-cell {
+  border-left: 1px solid #ddd;
+}

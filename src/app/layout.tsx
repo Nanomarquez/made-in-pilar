@@ -3,8 +3,6 @@ import { Providers } from "@/redux/provider";
 import { AuthenticatedLayout } from "@/hooks/AuthenticatedLayout";
 import Spinner from "./components/Spinner";
 import SideBar from "./components/SideBar";
-import { Banner } from "@/assets";
-import Image from "next/image";
 import DeviceDetector from "./components/DeviceDetector";
 
 export default function RootLayout({
@@ -44,21 +42,19 @@ export default function RootLayout({
         ></meta>
         <meta name="twitter:card" content="summary"></meta>
       </head>
-      <body className={`antialiased h-screen w-screen bg-[#0a0a0a]`}>
+      <body className={`antialiased h-screen w-screen bg-slate-200`}>
         <Providers>
           <DeviceDetector />
           <Spinner></Spinner>
           <AuthenticatedLayout>
-            <Image
-              src={Banner}
-              alt="banner"
-              height={1440}
-              width={1440}
-              className="object-cover w-screen h-screen absolute top-0 left-0 -z-50"
-            />
-            <div className="flex lg:flex-row flex-col">
-              <SideBar />
+            <div className="flex lg:flex-row flex-col h-screen">
+              <div className="hidden lg:block">
+                <SideBar />
+              </div>
               {children}
+              <div className="block lg:hidden">
+                <SideBar />
+              </div>
             </div>
           </AuthenticatedLayout>
         </Providers>

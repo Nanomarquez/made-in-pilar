@@ -1,50 +1,26 @@
-import { adminAuth } from "@/lib/firebaseAdmin";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import bcrypt from "bcrypt";
 
 export async function POST(req) {
-  const { username, password } = await req.json();
+  const { username } = await req.json();
 
   try {
     // Buscar al usuario en la base de datos
     const userDoc = await getDoc(doc(db, "users", username));
     if (!userDoc.exists()) {
-      return new Response(
-        JSON.stringify({ error: "Usuario no encontrado" }),
-        {
-          status: 404,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type",
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "Usuario no encontrado" }), {
+        status: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      });
     }
 
     const userData = userDoc.data();
 
-    // Verificar contraseña
-    const isPasswordValid = await bcrypt.compare(password, userData.password);
-    if (!isPasswordValid) {
-      return new Response(
-        JSON.stringify({ error: "Contraseña incorrecta" }),
-        {
-          status: 401,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type",
-          },
-        }
-      );
-    }
-
-    // Generar token personalizado
-    const token = await adminAuth.createCustomToken(userDoc.id);
-
-    return new Response(JSON.stringify({ token }), {
+    return new Response(JSON.stringify({ email: userData.email }), {
       status: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",

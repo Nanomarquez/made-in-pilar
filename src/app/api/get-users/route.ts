@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const q = query(
       collection(db, "users"),
-      where("username", "not-in", ["Admin"])
+      where("username", "not-in", ["admin"])
     );
     const snapshot = await getDocs(q);
     const users = snapshot.docs.map((doc) => {

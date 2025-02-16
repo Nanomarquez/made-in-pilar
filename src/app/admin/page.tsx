@@ -4,8 +4,6 @@ import { setIsAuth, setLoading } from "@/redux/global/globalSlice";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookingForm } from "@/components/BookingForm";
-import { Reservation } from "@/lib/types";
 import dayjs from "dayjs";
 import UserForm from "@/components/UserForm";
 import { signOut } from "firebase/auth";
@@ -33,10 +31,10 @@ function AdminPage() {
     null
   );
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<any[]>([]);
 
   useEffect(() => {
-    if (userCredentials?.uid !== "Admin") {
+    if (userCredentials?.uid !== "admin") {
       signOut(auth);
       dispatch(setIsAuth(false));
     }
@@ -121,8 +119,10 @@ function AdminPage() {
     fetchReservations,
   ]);
 
+  console.log({ admin: selectedReservDate });
+
   return (
-    <div className="p-2 md:p-5 h-screen flex gap-2 md:gap-5 flex-col lg:flex-row">
+    <div className="p-2 md:p-5 h-screen flex gap-5 md:gap-5 flex-col lg:flex-row">
       <div className="flex flex-col gap-5">
         <div className="w-full bg-[#1b1b1b]/50 backdrop-blur-lg rounded-md shadow-lg p-5 px-10 flex flex-col gap-5">
           <h1 className="text-2xl text-white drop-shadow-md font-black">
@@ -233,16 +233,16 @@ function AdminPage() {
         </div>
       )}
       {selectedReservDate && (
-        <div className="w-full bg-[#1b1b1b]/50 backdrop-blur-lg rounded-md shadow-lg p-5 px-10 h-min flex flex-col gap-5">
-          <p className="text-lg md:text-2xl text-white drop-shadow-md font-black">
+        <div className="w-full rounded-md shadow-lg p-5 px-10 h-min flex flex-col gap-5">
+          <p className="text-lg md:text-2xl text-black drop-shadow-md font-black">
             Fecha: {dayjs(selectedReservDate).format("DD/MM/YYYY")}
           </p>
-          <BookingForm
+          {/* <BookingForm
             isAdmin
             date={selectedReservDate.toISOString().split("T")[0]}
             availableSlots={availableSlots}
             onReservationComplete={() => setSelectedReservDate(null)}
-          />
+          /> */}
         </div>
       )}
     </div>
